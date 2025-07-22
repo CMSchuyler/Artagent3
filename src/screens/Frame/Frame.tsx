@@ -138,7 +138,7 @@ export const Frame = (): JSX.Element => {
       {/* Header */}
       <header className="w-full h-20 bg-[#57c2f3] flex items-center px-8">
         <h1 className="text-white text-3xl font-semibold">
-          Subject: Sunflower
+          Subject: War
         </h1>
       </header>
 

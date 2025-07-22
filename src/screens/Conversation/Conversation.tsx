@@ -86,11 +86,11 @@ const scrollbarStyles = `
 
 // 图片详细信息映射
 const paintingInfoMap: Record<string, string> = {
-  'xrk1.jpeg': '《向日葵》文森特·梵高（Vincent van Gogh，荷兰，1887–1889年）',
-  'xrk2.jpeg': '《向日葵花束》克劳德·莫奈（Claude Monet，法国，1881年）',
-  'xrk3.jpeg': '《向日葵》古斯塔夫·克里姆特（Gustav Klimt，奥地利，1906–1908）',
-  'xrk4.jpeg': '《向日葵》埃贡·席勒（Egon Schiele，奥地利，1909）',
-  'xrk5.jpeg': '《三十朵向日葵》大卫・霍克尼（David Hockney，英国，1996）',
+  'xrk1.jpeg': '《格尔尼卡》（Guernica）巴勃罗・毕加索（Pablo Picasso，西班牙，1937年）',
+  'xrk2.jpeg': '《自由引导人民》（La Liberté guidant le peuple）欧仁・德拉克罗瓦（Eugène Delacroix，法国，1830）',
+  'xrk3.jpeg': '《1808年5月3日夜枪杀起义者》弗朗西斯科・戈雅（Francisco Goya，西班牙，1814）',
+  'xrk4.jpeg': '《朝鲜大屠杀》（Massacrein Korea）毕加索 西班牙 1951 年',
+  'xrk5.jpeg': '《处决马克西米连》，马奈，法国，1867-68年',
 };
 
 /**
@@ -2014,11 +2014,11 @@ export const Conversation = (): JSX.Element => {
 
   // 图床链接映射
   const imageUrlMap: Record<string, string> = {
-    'xrk1.jpeg': 'https://z.wiki/u/IpkFhR',
-    'xrk2.jpeg': 'https://z.wiki/u/mpYISq',
-    'xrk3.jpeg': 'https://z.wiki/u/JRVojG',
-    'xrk4.jpeg': 'https://z.wiki/u/VHFZQv',
-    'xrk5.jpeg': 'https://z.wiki/u/Sy5mF0'
+    'xrk1.jpeg': 'https://z.wiki/u/UhuZcs',
+    'xrk2.jpeg': 'https://z.wiki/u/bK4TvB',
+    'xrk3.jpeg': 'https://z.wiki/u/pt8V67',
+    'xrk4.jpeg': 'https://z.wiki/u/YvKSy8',
+    'xrk5.jpeg': 'https://z.wiki/u/opPFZl'
   };
 
   // 处理AI图像生成
