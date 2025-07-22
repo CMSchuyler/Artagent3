@@ -1,0 +1,29 @@
+/* 自定义滚动条样式 */
+.custom-scrollbar::-webkit-scrollbar {
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #57c2f3;
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #4ab3e8;
+}
+
+/* 隐藏滚动条但保留功能 */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #57c2f3 #f1f1f1;
+}
+
+/* 自定义滚动条容器样式 */
+.custom-scrollbar {
+  position: relative;
+} 
