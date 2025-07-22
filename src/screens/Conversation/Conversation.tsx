@@ -2015,7 +2015,7 @@ export const Conversation = (): JSX.Element => {
   // 图床链接映射
   const imageUrlMap: Record<string, string> = {
     'xrk1.jpeg': 'https://z.wiki/u/UhuZcs',
-    'xrk2.jpeg': 'https://z.wiki/u/bK4TvB',
+    'xrk2.jpeg': 'https://z.wiki/u/20D0xE',
     'xrk3.jpeg': 'https://z.wiki/u/pt8V67',
     'xrk4.jpeg': 'https://z.wiki/u/YvKSy8',
     'xrk5.jpeg': 'https://z.wiki/u/opPFZl'
