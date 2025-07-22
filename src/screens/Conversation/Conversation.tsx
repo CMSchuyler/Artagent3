@@ -89,7 +89,7 @@ const paintingInfoMap: Record<string, string> = {
   'xrk1.jpeg': '《格尔尼卡》（Guernica）巴勃罗・毕加索（Pablo Picasso，西班牙，1937年）',
   'xrk2.jpeg': '《自由引导人民》（La Liberté guidant le peuple）欧仁・德拉克罗瓦（Eugène Delacroix，法国，1830）',
   'xrk3.jpeg': '《1808年5月3日夜枪杀起义者》弗朗西斯科・戈雅（Francisco Goya，西班牙，1814）',
-  'xrk4.jpeg': '《朝鲜大屠杀》（Massacrein Korea）毕加索 西班牙 1951 年',
+  'xrk4.jpeg': '《战争》亨利·卢梭（Henri Rousseau ，法国，1844 - 1910）',
   'xrk5.jpeg': '《处决马克西米连》，马奈，法国，1867-68年',
 };
 
