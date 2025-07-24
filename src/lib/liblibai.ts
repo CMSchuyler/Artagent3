@@ -372,7 +372,7 @@ export class LiblibAIService {
   }
 
   // 等待生成结果
-  public async waitAppResult(generateUuid: string, maxAttempts: number = 60, interval: number = 3000): Promise<string> {
+  public async waitAppResult(generateUuid: string, maxAttempts: number = 120, interval: number = 3000): Promise<string> {
     console.log(`开始轮询生成结果, UUID: ${generateUuid}`);
     
     // 生成状态枚举
