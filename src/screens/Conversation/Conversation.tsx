@@ -103,7 +103,8 @@ function formatAgentReply(reply: string): string {
     .replace(/\*\*|\*/g, '')
     .replace(/###/g, '\n')
     .replace(/[（(]\s*\d+\s*字\s*[左右]*\s*[）)]/g, '')
-    .replace(/<\|FunctionCallEnd\|>/g, '');
+    .replace(/<\|FunctionCallEnd\|>/g, '')
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, '');
 }
 
 // 在文件顶部添加统一API基础地址
