@@ -867,9 +867,9 @@ export const Conversation = (): JSX.Element => {
             return `【图片${idx + 1}: ${url}】`;
           }
         });
-        messageWithImageInfo = '限制500字以内\n' + imageInfoLines.join('\n') + '\n' + message;
+        messageWithImageInfo = '语言自然简洁\n' + imageInfoLines.join('\n') + '\n' + message;
       } else {
-        messageWithImageInfo = '限制500字以内\n' + message;
+        messageWithImageInfo = '语言自然简洁\n' + message;
       }
       
       // 处理图片上传
