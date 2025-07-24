@@ -483,7 +483,7 @@ app.post('/api/debate', async (req, res) => {
           contextMessage = `用户说: "${message}"
 \n其他专家的评论:
 ${responses.map((r, i) => `${respondedAgentTitles[i]}: "${r}"`).join('\n')}
-\n请你作为${agentTitle}，考虑以上评论，给出自己的看法，可以反驳，也可以支持。（简洁回答）`;
+\n请你作为${agentTitle}，考虑以上评论，给出自己的看法，可以反驳，也可以支持。（自然简洁回答）`;
         }
         const result = await sendMessageToCoze(
           botId,
@@ -629,7 +629,7 @@ app.get('/api/debate/stream/:streamId', async (req, res) => {
           contextMessage = `用户说: "${message}"
 \n其他专家的评论:
 ${responses.map((r, idx) => `${respondedAgentTitles[idx]}: "${r}"`).join('\n')}
-\n请你作为${agentTitle}，考虑以上评论，给出自己的看法，可以反驳，也可以支持。（简洁回答）`;
+\n请你作为${agentTitle}，考虑以上评论，给出自己的看法，可以反驳，也可以支持。（自然简洁回答）`;
         }
         const result = await sendMessageToCoze(
           botId,
@@ -759,7 +759,7 @@ app.post('/api/debate/stream', async (req, res) => {
           contextMessage = `用户说: "${message}"
 \n其他专家的评论:
 ${responses.map((r, idx) => `${respondedAgentTitles[idx]}: "${r}"`).join('\n')}
-\n请你作为${agentTitle}，考虑以上评论，给出自己的看法，可以反驳，也可以支持。（简洁回答）`;
+\n请你作为${agentTitle}，考虑以上评论，给出自己的看法，可以反驳，也可以支持。（自然简洁回答）`;
         }
         const result = await sendMessageToCoze(
           botId,
