@@ -6,7 +6,7 @@
 
 // 辩论服务器基础URL
 const DEBATE_API_BASE_URL = import.meta.env.PROD   
-? 'https://artagent.onrender.com/api'  // 生产环境 - 请替换为您的实际后端URL  
+? 'https://artagent3.onrender.com/api'  // 生产环境 - 请替换为您的实际后端URL  
 : 'http://localhost:3002/api';  // 开发环境
 
 /**

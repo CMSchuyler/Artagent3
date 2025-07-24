@@ -108,7 +108,7 @@ function formatAgentReply(reply: string): string {
 
 // 在文件顶部添加统一API基础地址
 const API_BASE_URL = import.meta.env.PROD
-  ? 'https://artagent.onrender.com/api' // 生产环境 - 请替换为实际后端URL
+  ? 'https://artagent3.onrender.com/api' // 生产环境 - 请替换为实际后端URL
   : 'http://localhost:3002/api'; // 开发环境
 
 export const Conversation = (): JSX.Element => {
