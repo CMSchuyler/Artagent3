@@ -2072,13 +2072,14 @@ export const Conversation = (): JSX.Element => {
       const generateUuid = await liblibAIService.runComfy({
         templateUuid: "4df2efa0f18d46dc9758803e478eb51c",
         generateParams: {
-          "362": {
+          "324": {
             "class_type": "FluxKontextProImageNode",
             "inputs": {
-              "aspect_ratio": closest.label
+              "aspect_ratio": closest.label,
+              "guidance": 3,
             }
           },
-          "326": {
+          "381": {
             "class_type": "LoadImage",
             "inputs": {
               "image": selectedImageUrl
@@ -2090,7 +2091,7 @@ export const Conversation = (): JSX.Element => {
               "text": aiPrompt
             }
           },
-          "workflowUuid": "15606431ca40417a81a45e25fb29fb9c"
+          "workflowUuid": "dba1b7a1bf554a21acc13f7d7141894b"
         }
       });
       
