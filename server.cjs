@@ -6,7 +6,7 @@ const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const axios = require('axios');
 const FormData = require('form-data');
-const { createProxyMiddleware } = require('http-proxy-middleware');
+const cloudinary = require('cloudinary').v2;
 
 const app = express();
 const port = process.env.PORT || 3002;
@@ -26,23 +26,34 @@ const API_TOKEN = 'pat_OBvyBcvJsvQcJsW2ykls061ZysdZkdu7RFtsggcJyhZi1EUi8wubz55ul
 const API_BASE_URL = 'https://api.coze.cn';
 
 /**
+ * 配置Cloudinary
+ */
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'dfbmcfgfr',
+  api_key: process.env.CLOUDINARY_API_KEY || '813374233366933',
+  api_secret: process.env.CLOUDINARY_API_SECRET || 'LA68u_uY9s_eDKuw_fsZC2MSg1Y'
+});
+
+/**
  * 智能体ID映射
  * @type {Object<string, string>}
  */
 const AGENT_BOT_IDS = {
-  "Art Critic": "7530491046523355186",
-  "General Audience": "7530492365207994377",
-  "Art Theorist": "7530486451499499566",
-  "Art Historian": "7530492348439461951",
-  "Painter": "7530486679720001555",
-  "Art Collector": "7530492365208190985",
-  "VTS": "7530493688456462372",
-  "Artagent": "7530954468356358183",
+  "Art Critic": "7524345845467299855",
+  "General Audience": "7524345845467136015",
+  "Art Theorist": "7524344850851168291",
+  "Art Historian": "7524342395841396736",
+  "Painter": "7524341444501782567",
+  "Art Collector": "7524340821945630783",
+  "VTS": "7524342433057046574",
+  "Artagent": "7527602426371751977"
 };
 
 // ================== 中间件与上传配置 ==================
 app.use(cors());
-app.use(express.json());
+// 增加请求体大小限制以支持base64图片数据（设置为100MB以确保足够大）
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true, parameterLimit: 50000 }));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const storage = multer.diskStorage({
@@ -895,38 +906,240 @@ app.get('/api/debate-history', (req, res) => {
 });
 
 
-// ========== liblibai 代理路由 ==========
+// ========== BFL API 代理路由 ==========
 /**
- * 代理 /api/liblibai 路由，将请求转发到 https://openapi.liblibai.cloud
+ * BFL API Key
  */
-app.use('/api/liblibai', (req, res, next) => {
-  console.log('Express 收到 /api/liblibai 路由请求:', req.method, req.originalUrl);
-  next();
+const BFL_API_KEY = 'e9d26fd6-4a90-48e3-b713-7d26aeb85e51';
+
+/**
+ * 翻译API Token
+ */
+const TRANSLATE_API_TOKEN = 'TSnyMNFfrDynIp6CqfB5';
+
+/**
+ * 调用翻译API将中文翻译成英文
+ * @param {string} text 需要翻译的文本
+ * @returns {Promise<string>} 翻译后的英文文本
+ */
+async function translateToEnglish(text) {
+  try {
+    console.log('开始翻译文本:', text.substring(0, 50) + '...');
+    
+    const response = await axios.post(
+      `http://www.trans-home.com/api/index/translate?token=${TRANSLATE_API_TOKEN}`,
+      {
+        keywords: text,
+        targetLanguage: 'en'
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        timeout: 10000
+      }
+    );
+    
+    console.log('翻译API响应:', response.data);
+    
+    // 根据实际API响应格式提取翻译结果
+    if (response.data && response.data.code === 1 && response.data.data && response.data.data.text) {
+      const translatedText = response.data.data.text;
+      console.log('翻译成功:', translatedText);
+      return translatedText;
+    } else {
+      console.warn('翻译API返回格式不符合预期，使用原文本');
+      console.warn('响应内容:', response.data);
+      return text;
+    }
+  } catch (error) {
+    console.error('翻译失败，使用原文本:', error.message);
+    // 翻译失败时使用原文本
+    return text;
+  }
+}
+
+/**
+ * 代理 /api/bfl 路由，将请求转发到 BFL API
+ */
+app.post('/api/bfl', async (req, res) => {
+  try {
+    const { prompt, input_image, aspect_ratio } = req.body;
+    
+    if (!prompt || !input_image) {
+      return res.status(400).json({ error: '缺少必要参数: prompt 或 input_image' });
+    }
+    
+    console.log('接收到BFL API请求:', { 
+      prompt: prompt.substring(0, 50) + '...', 
+      aspect_ratio,
+      input_image_length: input_image.length 
+    });
+    
+    // 先翻译prompt为英文
+    const translatedPrompt = await translateToEnglish(prompt);
+    console.log('原始prompt:', prompt.substring(0, 50) + '...');
+    console.log('翻译后prompt:', translatedPrompt.substring(0, 50) + '...');
+    
+    // 转发到BFL API（使用翻译后的prompt）
+    const response = await axios.post('https://api.bfl.ai/v1/flux-kontext-pro', {
+      prompt: translatedPrompt, // 使用翻译后的英文prompt
+      input_image,
+      aspect_ratio
+    }, {
+      headers: {
+        'accept': 'application/json',
+        'x-key': BFL_API_KEY,
+        'Content-Type': 'application/json'
+      },
+      timeout: 30000
+    });
+    
+    console.log('BFL API响应:', response.data);
+    res.json(response.data);
+  } catch (error) {
+    console.error('BFL API请求失败:', error?.response?.data || error.message);
+    if (error.response) {
+      res.status(error.response.status).json(error.response.data);
+    } else {
+      res.status(500).json({ error: error.message || '服务器内部错误' });
+    }
+  }
 });
 
-// 再注册代理
-app.use('/api/liblibai', createProxyMiddleware({
-  target: 'https://openapi.liblibai.cloud',
-  changeOrigin: true,
-  pathRewrite: { '^/api/liblibai': '' },
-  onProxyReq: (proxyReq, req, res) => {
-    console.log('代理收到请求方法:', req.method, req.originalUrl);
-    const protocol = 'https:';
-    const host = proxyReq.getHeader('host');
-    const path = proxyReq.path;
-    const fullUrl = `${protocol}//${host}${path}`;
-    console.log('后端即将代理到:', fullUrl);
-  },
-  secure: false
-}));
+/**
+ * BFL API 轮询代理
+ */
+app.get('/api/bfl/poll', async (req, res) => {
+  try {
+    const { polling_url } = req.query;
+    
+    if (!polling_url) {
+      return res.status(400).json({ error: '缺少polling_url参数' });
+    }
+    
+    console.log('轮询BFL API:', polling_url);
+    
+    const response = await axios.get(polling_url, {
+      headers: {
+        'accept': 'application/json',
+        'x-key': BFL_API_KEY
+      },
+      timeout: 30000
+    });
+    
+    console.log('BFL轮询响应:', response.data);
+    
+    // 如果图片生成完成，自动保存到Cloudinary
+    if (response.data.status === 'Ready' && response.data.result && response.data.result.sample) {
+      try {
+        console.log('图片生成完成，开始保存到Cloudinary:', response.data.result.sample);
+        const savedImageUrl = await saveImageToCloudinary(response.data.result.sample);
+        // 在响应中添加保存后的URL
+        response.data.result.saved_url = savedImageUrl;
+        console.log('图片已保存到Cloudinary:', savedImageUrl);
+      } catch (error) {
+        console.warn('保存图片到Cloudinary失败:', error);
+        // 不影响主流程，继续返回原始URL
+      }
+    }
+    
+    res.json(response.data);
+  } catch (error) {
+    console.error('BFL轮询请求失败:', error?.response?.data || error.message);
+    if (error.response) {
+      res.status(error.response.status).json(error.response.data);
+    } else {
+      res.status(500).json({ error: error.message || '服务器内部错误' });
+    }
+  }
+});
+
+/**
+ * 保存图片到Cloudinary云存储
+ * @param {string} imageUrl BFL生成的图片URL
+ * @returns {string} Cloudinary的图片URL
+ */
+async function saveImageToCloudinary(imageUrl) {
+  try {
+    console.log('开始下载并上传图片到Cloudinary:', imageUrl);
+    
+    // 1. 使用Cloudinary直接从URL上传（更简单的方法）
+    const result = await cloudinary.uploader.upload(imageUrl, {
+      folder: 'artagent-generated', // 保存到特定文件夹
+      resource_type: 'image',
+      public_id: `generated_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`, // 唯一ID
+      overwrite: false,
+      quality: 'auto:good', // 自动优化质量
+      fetch_format: 'auto' // 自动选择最佳格式
+    });
+    
+    console.log('图片上传到Cloudinary成功:', {
+      public_id: result.public_id,
+      url: result.secure_url,
+      size: result.bytes
+    });
+    
+    return result.secure_url;
+  } catch (error) {
+    console.error('保存图片到Cloudinary失败:', error);
+    throw error;
+  }
+}
+
+// ========== liblibai 代理路由（保留用于兼容性） ==========
+/**
+ * 代理 /api/liblibai 路由，将请求转发到 https://openapi.liblibai.cloud
+ * 前端会以 { path, signatureParams, data } 结构POST到本接口
+ * 后端需解包后转发到真实API
+ */
+app.post('/api/liblibai', async (req, res) => {
+  try {
+    const { path, signatureParams, data } = req.body;
+    if (!path || !signatureParams) {
+      return res.status(400).json({ code: -1, msg: '缺少 path 或 signatureParams' });
+    }
+    const url = `https://openapi.liblibai.cloud${path}?${signatureParams}`;
+    // 直接转发 data
+    const response = await axios.post(url, data, {
+      headers: { 'Content-Type': 'application/json' },
+      timeout: 30000
+    });
+    res.status(response.status).json(response.data);
+  } catch (error) {
+    console.error('liblibai 代理请求失败:', error?.response?.data || error.message);
+    if (error.response) {
+      res.status(error.response.status).json(error.response.data);
+    } else {
+      res.status(500).json({ code: -1, msg: error.message || '服务器内部错误' });
+    }
+  }
+});
 
 // ================== 错误处理 ==================
+// ================== 错误处理中间件 ==================
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ success: false, error: '服务器内部错误' });
 });
 
+// ================== 健康检查端点 ==================
+app.get('/api/health', (req, res) => {
+  res.json({ 
+    status: 'healthy', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+    limits: {
+      json: '100mb',
+      urlencoded: '100mb'
+    }
+  });
+});
+
 // ================== 启动服务器 ==================
 app.listen(port, () => {
   console.log(`服务器已启动，监听端口 ${port}`);
+  console.log(`健康检查地址: http://localhost:${port}/api/health`);
+  console.log(`请求体大小限制: 100MB`);
 }); 
